@@ -5,7 +5,6 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 
 interface APIClient {
@@ -23,19 +22,9 @@ interface APIClient {
 
 
 class PokemonClient: APIClient {
-
     suspend fun fetchPokemon(id: Int): Pokemon {
-        val pokemon: Pokemon = httpClient.get("https://pokeapi.co/api/v2/pokemon/1").body()
+        val pokemon: Pokemon = httpClient.get("https://pokeapi.co/api/v2/pokemon/$id").body()
         return pokemon
-    }
-
-    suspend fun fetchPokemonList(from: Int, to: Int): List<Pokemon> = coroutineScope {
-        val requests = (from..to).map { id ->
-            async {
-                fetchPokemon(id)
-            }
-        }
-        requests.awaitAll()
     }
 }
 

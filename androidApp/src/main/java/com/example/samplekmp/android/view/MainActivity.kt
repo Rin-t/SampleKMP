@@ -1,9 +1,11 @@
-package com.example.samplekmp.android
+package com.example.samplekmp.android.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.samplekmp.Pokemon
-import com.example.samplekmp.PokemonListViewModel
-import com.example.samplekmp.Sprity
+import com.example.samplekmp.android.MyApplicationTheme
+import com.example.samplekmp.android.viewModel.PokemonListViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,12 +41,16 @@ fun PokemonListPage(viewModel: PokemonListViewModel = PokemonListViewModel()) {
         println("LaunchedEffect")
         viewModel.onAppear()
     }
-    PokemonCardView(pokemon)
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(pokemon) {
+            PokemonCardView(it)
+        }
+    }
 }
 
 @Composable
-fun PokemonCardView(pokemon: Pokemon?) {
-    Text(text = pokemon?.name ?: "Loading...")
+fun PokemonCardView(pokemon: Pokemon) {
+    Text(text = pokemon.name)
 }
 
 @Preview
