@@ -6,9 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.samplekmp.Greeting
+import com.example.samplekmp.Pokemon
+import com.example.samplekmp.PokemonListViewModel
+import com.example.samplekmp.Sprity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,9 +23,9 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color.White
                 ) {
-                    GreetingView(Greeting().greet())
+                    PokemonListPage()
                 }
             }
         }
@@ -27,14 +33,24 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GreetingView(text: String) {
-    Text(text = text)
+fun PokemonListPage(viewModel: PokemonListViewModel = PokemonListViewModel()) {
+    val pokemon by viewModel.pokemon.collectAsState()
+    LaunchedEffect(Unit) {
+        println("LaunchedEffect")
+        viewModel.onAppear()
+    }
+    PokemonCardView(pokemon)
+}
+
+@Composable
+fun PokemonCardView(pokemon: Pokemon?) {
+    Text(text = pokemon?.name ?: "Loading...")
 }
 
 @Preview
 @Composable
 fun DefaultPreview() {
     MyApplicationTheme {
-        GreetingView("Hello, Android!")
+        //PokemonCardView(Pokemon("Pikachu", Sprity("","")))
     }
 }
