@@ -23,8 +23,12 @@ interface APIClient {
 
 class PokemonClient: APIClient {
     suspend fun fetchPokemon(id: Int): Pokemon {
-        val pokemon: Pokemon = httpClient.get("https://pokeapi.co/api/v2/pokemon/$id").body()
-        return pokemon
+        val urlString = "https://pokeapi.co/api/v2/pokemon/$id"
+        println("urlはこれ")
+        println(message = urlString)
+        val response = httpClient.get(urlString)
+        println(response.toString())
+        return response.body()
     }
 }
 

@@ -42,5 +42,8 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
+    implementation("io.coil-kt:coil:2.6.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.ktor:ktor-client-android:2.3.7")
     debugImplementation(libs.compose.ui.tooling)
 }
