@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 android {
@@ -43,6 +44,8 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
     implementation("io.coil-kt:coil:2.7.0")
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.ktor:ktor-client-android:3.3.3")
