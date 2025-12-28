@@ -50,8 +50,7 @@ fun MainScreen() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBar(
-            ) {
+            NavigationBar {
                 bottomNavItems.forEach { item ->
                     NavigationBarItem(
                         selected = currentDestination?.hierarchy?.any {
