@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.skie)
+    alias(libs.plugins.apollo)
 }
 
 kotlin {
@@ -24,6 +25,7 @@ kotlin {
             implementation(libs.ktor)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.apollo.runtime)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.android)
@@ -49,5 +51,12 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+apollo {
+    service("service") {
+        packageName.set("com.example.samplekmp.graphql")
+        generateKotlinModels.set(true)
     }
 }

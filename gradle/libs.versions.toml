@@ -6,6 +6,7 @@ compose-material3 = "1.1.2"
 androidx-activityCompose = "1.8.0"
 androidx-lifecycle = "2.10.0"
 androidx-navigation = "2.8.5"
+apollo = "4.0.0"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.3.3"
 skie = "0.10.8"
@@ -29,6 +30,7 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
+apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo" }
 
 
 [plugins]
@@ -40,3 +42,4 @@ kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = 
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
+apollo = { id = "com.apollographql.apollo", version.ref = "apollo" }
