@@ -37,7 +37,7 @@ data class BottomNavItem<T : Any>(
 )
 
 @Composable
-fun MainScreen() {
+fun TabPage() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
