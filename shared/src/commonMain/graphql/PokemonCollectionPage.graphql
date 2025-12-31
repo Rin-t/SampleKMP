@@ -1,0 +1,9 @@
+query PokemonCollectionPage($limit: Int!, $offset: Int!) {
+  pokemon(limit: $limit, offset: $offset, order_by: { id: asc }) {
+    id
+    name
+    pokemonsprites {
+      sprites(path: "front_default")
+    }
+  }
+}
