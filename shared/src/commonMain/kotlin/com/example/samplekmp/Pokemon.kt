@@ -1,20 +1,17 @@
 package com.example.samplekmp
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.example.samplekmp.graphql.PokemonCollectionPageQuery
 
-@Serializable
-data class Pokemon(
-    @SerialName("name")
+data class PokemonListItem(
+    val id: Int,
     val name: String,
-    @SerialName("sprites")
-    val sprities: Sprity
+    val spriteUrl: String?
 )
 
-@Serializable
-data class Sprity(
-    @SerialName("front_default")
-    val normal: String,
-    @SerialName("front_shiny")
-    val shiny: String
-)
+fun PokemonCollectionPageQuery.Pokemon.toPokemonListItem(): PokemonListItem {
+    return PokemonListItem(
+        id = id,
+        name = name,
+        spriteUrl = pokemonsprites.firstOrNull()?.sprites as? String
+    )
+}
