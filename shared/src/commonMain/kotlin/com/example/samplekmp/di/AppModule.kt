@@ -1,6 +1,7 @@
 package com.example.samplekmp.di
 
 import com.apollographql.apollo.ApolloClient
+import com.example.samplekmp.PokemonDetailUseCase
 import com.example.samplekmp.PokemonUseCase
 import org.koin.dsl.module
 
@@ -11,4 +12,5 @@ val appModule = module {
             .build()
     }
     factory { PokemonUseCase(get()) }
+    factory { (id: Int) -> PokemonDetailUseCase(get(), id) }
 }
