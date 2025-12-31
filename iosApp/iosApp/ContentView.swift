@@ -45,7 +45,10 @@ struct PokemonListView: View {
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 8) {
                             ForEach(pokemonList, id: \.id) { pokemon in
-                                PokemonGridItemView(pokemon: pokemon)
+                                NavigationLink(destination: PokemonDetailView(pokemonId: pokemon.id)) {
+                                    PokemonGridItemView(pokemon: pokemon)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                         .padding(8)
