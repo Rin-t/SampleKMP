@@ -1,14 +1,12 @@
 package com.example.samplekmp.android.view
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
-import androidx.compose.ui.unit.dp
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 
 @Serializable
-object SearchRoute
+object PokemonListRoute
 
 @Serializable
 object MenuRoute
@@ -43,7 +41,7 @@ fun MainScreen() {
     val currentDestination = navBackStackEntry?.destination
 
     val bottomNavItems = listOf(
-        BottomNavItem(SearchRoute, "検索", Icons.Default.Search),
+        BottomNavItem(PokemonListRoute, "図鑑", Icons.Default.List),
         BottomNavItem(MenuRoute, "メニュー", Icons.Default.Menu)
     )
 
@@ -74,13 +72,13 @@ fun MainScreen() {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = SearchRoute,
+            startDestination = PokemonListRoute,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            composable<SearchRoute> {
-                SearchPokemonScreen()
+            composable<PokemonListRoute> {
+                PokemonListScreen()
             }
             composable<MenuRoute> {
                 MenuScreen()
