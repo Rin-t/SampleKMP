@@ -2,31 +2,37 @@ package com.example.samplekmp.android.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.samplekmp.Pokemon
+import com.example.samplekmp.PokemonListItem
 import com.example.samplekmp.PokemonUseCase
-import com.example.samplekmp.Sprity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PokemonListViewModel: ViewModel() {
+sealed class PokemonListUiState {
+    data object Loading : PokemonListUiState()
+    data class Success(val pokemonList: List<PokemonListItem>) : PokemonListUiState()
+    data class Error(val message: String) : PokemonListUiState()
+}
+
+class PokemonListViewModel : ViewModel() {
     private val pokemonUseCase = PokemonUseCase()
 
-    private val _pokemon = MutableStateFlow<Pokemon?>(null)
-    val pokemon: StateFlow<Pokemon?> = _pokemon.asStateFlow()
+    private val _uiState = MutableStateFlow<PokemonListUiState>(PokemonListUiState.Loading)
+    val uiState: StateFlow<PokemonListUiState> = _uiState.asStateFlow()
 
-    fun onClickSearchButton(id: Int) {
-        println("onClickSearchButton")
+    init {
+        loadPokemonList()
+    }
+
+    fun loadPokemonList() {
         viewModelScope.launch {
+            _uiState.emit(PokemonListUiState.Loading)
             try {
-                println("fetching Pokemon")
-                val pokemon = pokemonUseCase.fetchPokemon(id)
-                _pokemon.emit(pokemon)
-                println("pokemon name")
-                println(pokemon.name)
+                val pokemonList = pokemonUseCase.fetchPokemonList(limit = 50, offset = 0)
+                _uiState.emit(PokemonListUiState.Success(pokemonList))
             } catch (e: Exception) {
-                println("Error: ${e.message}")
+                _uiState.emit(PokemonListUiState.Error(e.message ?: "Unknown error"))
             }
         }
     }
