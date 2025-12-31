@@ -1,4 +1,4 @@
-package com.example.samplekmp.android.view
+package com.example.samplekmp.android.view.page
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

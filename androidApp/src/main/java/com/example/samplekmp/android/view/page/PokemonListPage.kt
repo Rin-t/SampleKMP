@@ -1,4 +1,4 @@
-package com.example.samplekmp.android.view
+package com.example.samplekmp.android.view.page
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,7 +16,7 @@ import com.example.samplekmp.android.view.components.PokemonGrid
 import kotlinx.coroutines.launch
 
 @Composable
-fun PokemonListScreen(modifier: Modifier = Modifier) {
+fun PokemonListPage(modifier: Modifier = Modifier) {
     var uiState by remember { mutableStateOf<PokemonListUiState>(PokemonListUiState.Loading) }
     val useCase = remember { PokemonUseCase() }
     val scope = rememberCoroutineScope()
