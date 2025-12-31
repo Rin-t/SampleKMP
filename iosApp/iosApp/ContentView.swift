@@ -27,7 +27,7 @@ enum PokemonListViewUiState {
 
 struct PokemonListView: View {
     @State private var uiState: PokemonListViewUiState = .loading
-    private let useCase = PokemonUseCase()
+    private let useCase = KoinHelper.shared.getPokemonUseCase()
 
     private let columns = [
         GridItem(.flexible()),

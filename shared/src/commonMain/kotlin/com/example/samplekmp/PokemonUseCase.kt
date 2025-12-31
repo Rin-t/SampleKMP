@@ -1,10 +1,9 @@
 package com.example.samplekmp
 
+import com.apollographql.apollo.ApolloClient
 import com.example.samplekmp.graphql.PokemonCollectionPageQuery
-import com.example.samplekmp.network.ApolloClientProvider
 
-class PokemonUseCase {
-    private val apolloClient = ApolloClientProvider.apolloClient
+class PokemonUseCase(private val apolloClient: ApolloClient) {
 
     suspend fun fetchPokemonList(limit: Int, offset: Int): List<PokemonListItem> {
         val response = apolloClient.query(

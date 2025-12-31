@@ -14,11 +14,12 @@ import com.example.samplekmp.android.view.components.ErrorMessage
 import com.example.samplekmp.android.view.components.LoadingIndicator
 import com.example.samplekmp.android.view.components.PokemonGrid
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun PokemonListPage(modifier: Modifier = Modifier) {
     var uiState by remember { mutableStateOf<PokemonListUiState>(PokemonListUiState.Loading) }
-    val useCase = remember { PokemonUseCase() }
+    val useCase: PokemonUseCase = koinInject()
     val scope = rememberCoroutineScope()
 
     val loadPokemonList: () -> Unit = {

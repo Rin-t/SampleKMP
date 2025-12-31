@@ -7,6 +7,7 @@ androidx-activityCompose = "1.8.0"
 androidx-lifecycle = "2.10.0"
 androidx-navigation = "2.8.5"
 apollo = "4.0.0"
+koin = "4.0.0"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.3.3"
 skie = "0.10.8"
@@ -31,7 +32,9 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo" }
-
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
