@@ -2,53 +2,128 @@ import SwiftUI
 import shared
 
 struct ContentView: View {
-    
-    @StateObject var viewModel = ViewModel()
-    @State var textFieldInput = ""
+    @StateObject var viewModel = PokemonListViewModel()
 
-	var body: some View {
-        VStack {
-            TextField("1~151の数字を入力", text: $textFieldInput)
-                .padding(.horizontal, 32)
-                .padding(.bottom, 24)
-            
-            Button {
-                let id = Int32(textFieldInput) ?? 1
-                viewModel.tappedSearchButton(id: id)
-            } label: {
-                Text("Search")
-            }
-            
-            AsyncImage(url: viewModel.imageURL)
-                .frame(width: 200, height: 200)
-                .foregroundStyle(.white)
-            Text(viewModel.pokemon?.name ?? "")
+    var body: some View {
+        TabView {
+            PokemonListView(viewModel: viewModel)
+                .tabItem {
+                    Image(systemName: "list.bullet")
+                    Text("図鑑")
+                }
+
+            MenuView()
+                .tabItem {
+                    Image(systemName: "line.3.horizontal")
+                    Text("メニュー")
+                }
         }
-	}
+    }
+}
+
+struct PokemonListView: View {
+    @ObservedObject var viewModel: PokemonListViewModel
+
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
+
+    var body: some View {
+        NavigationView {
+            Group {
+                switch viewModel.uiState {
+                case .loading:
+                    ProgressView()
+                case .success(let pokemonList):
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 8) {
+                            ForEach(pokemonList, id: \.id) { pokemon in
+                                PokemonGridItemView(pokemon: pokemon)
+                            }
+                        }
+                        .padding(8)
+                    }
+                case .error(let message):
+                    VStack {
+                        Text(message)
+                        Button("再試行") {
+                            viewModel.loadPokemonList()
+                        }
+                    }
+                }
+            }
+            .navigationTitle("ポケモン図鑑")
+        }
+    }
+}
+
+struct PokemonGridItemView: View {
+    let pokemon: PokemonListItem
+
+    var body: some View {
+        VStack {
+            AsyncImage(url: URL(string: pokemon.spriteUrl ?? "")) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            } placeholder: {
+                ProgressView()
+            }
+            .frame(width: 80, height: 80)
+
+            Text("#\(pokemon.id)")
+                .font(.caption)
+            Text(pokemon.name)
+                .font(.caption)
+                .lineLimit(1)
+        }
+        .padding(8)
+        .background(Color(.systemGray6))
+        .cornerRadius(8)
+    }
+}
+
+struct MenuView: View {
+    var body: some View {
+        NavigationView {
+            Text("メニュー")
+                .navigationTitle("メニュー")
+        }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
-	static var previews: some View {
-		ContentView()
-	}
+    static var previews: some View {
+        ContentView()
+    }
+}
+
+enum PokemonListUiState {
+    case loading
+    case success([PokemonListItem])
+    case error(String)
 }
 
 @MainActor
-final class ViewModel: ObservableObject {
-    @Published var pokemon: Pokemon?
-    var imageURL: URL? {
-        guard let pokemon else { return nil }
-        return URL(string: pokemon.sprities.normal)!
-    }
-    
-    let useCase = PokemonUseCase()
+final class PokemonListViewModel: ObservableObject {
+    @Published var uiState: PokemonListUiState = .loading
 
-    func tappedSearchButton(id: Int32) {
+    private let useCase = PokemonUseCase()
+
+    init() {
+        loadPokemonList()
+    }
+
+    func loadPokemonList() {
+        uiState = .loading
         Task {
             do {
-                pokemon = try await useCase.fetchPokemon(id: id)
+                let pokemonList = try await useCase.fetchPokemonList(limit: 50, offset: 0)
+                uiState = .success(pokemonList)
             } catch {
-                print("error")
+                uiState = .error(error.localizedDescription)
             }
         }
     }
