@@ -1,5 +1,10 @@
 package com.example.samplekmp.android.view.page
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,8 +21,12 @@ import com.example.samplekmp.android.view.components.PokemonGrid
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PokemonListPage(modifier: Modifier = Modifier) {
+fun PokemonListPage(
+    onNavigateToDetail: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var uiState by remember { mutableStateOf<PokemonListUiState>(PokemonListUiState.Loading) }
     val useCase: PokemonUseCase = koinInject()
     val scope = rememberCoroutineScope()
@@ -38,22 +47,29 @@ fun PokemonListPage(modifier: Modifier = Modifier) {
         loadPokemonList()
     }
 
-    when (val state = uiState) {
-        is PokemonListUiState.Loading -> {
-            LoadingIndicator(modifier = modifier)
-        }
-        is PokemonListUiState.Success -> {
-            PokemonGrid(
-                pokemonList = state.pokemonList,
-                modifier = modifier
-            )
-        }
-        is PokemonListUiState.Error -> {
-            ErrorMessage(
-                message = state.message,
-                onRetry = loadPokemonList,
-                modifier = modifier
-            )
+    Column(modifier = modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text("ポケモン図鑑") }
+        )
+
+        when (val state = uiState) {
+            is PokemonListUiState.Loading -> {
+                LoadingIndicator(modifier = Modifier.fillMaxSize())
+            }
+            is PokemonListUiState.Success -> {
+                PokemonGrid(
+                    pokemonList = state.pokemonList,
+                    onItemClick = { pokemon -> onNavigateToDetail(pokemon.id) },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            is PokemonListUiState.Error -> {
+                ErrorMessage(
+                    message = state.message,
+                    onRetry = loadPokemonList,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }

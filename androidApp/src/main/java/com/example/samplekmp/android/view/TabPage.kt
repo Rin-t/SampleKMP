@@ -20,7 +20,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.samplekmp.android.view.page.MenuScreen
+import com.example.samplekmp.android.view.page.PokemonDetailPage
 import com.example.samplekmp.android.view.page.PokemonListPage
 import kotlinx.serialization.Serializable
 
@@ -29,6 +31,9 @@ object PokemonListRoute
 
 @Serializable
 object MenuRoute
+
+@Serializable
+data class PokemonDetailRoute(val pokemonId: Int)
 
 data class BottomNavItem<T : Any>(
     val route: T,
@@ -77,13 +82,24 @@ fun TabPage() {
             startDestination = PokemonListRoute,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
             composable<PokemonListRoute> {
-                PokemonListPage()
+                PokemonListPage(
+                    onNavigateToDetail = { pokemonId ->
+                        navController.navigate(PokemonDetailRoute(pokemonId))
+                    }
+                )
             }
             composable<MenuRoute> {
                 MenuScreen()
+            }
+            composable<PokemonDetailRoute> { backStackEntry ->
+                val route: PokemonDetailRoute = backStackEntry.toRoute()
+                PokemonDetailPage(
+                    pokemonId = route.pokemonId,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
         }
     }

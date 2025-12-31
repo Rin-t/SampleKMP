@@ -13,6 +13,7 @@ import com.example.samplekmp.PokemonListItem
 @Composable
 fun PokemonGrid(
     pokemonList: List<PokemonListItem>,
+    onItemClick: (PokemonListItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -23,7 +24,10 @@ fun PokemonGrid(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(pokemonList) { pokemon ->
-            PokemonGridItem(pokemon = pokemon)
+            PokemonGridItem(
+                pokemon = pokemon,
+                onClick = { onItemClick(pokemon) }
+            )
         }
     }
 }
