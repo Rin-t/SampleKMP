@@ -1,6 +1,7 @@
 package com.example.samplekmp
 
 import com.example.samplekmp.graphql.PokemonCollectionPageQuery
+import com.example.samplekmp.network.ApolloClientProvider
 
 class PokemonUseCase {
     private val apolloClient = ApolloClientProvider.apolloClient

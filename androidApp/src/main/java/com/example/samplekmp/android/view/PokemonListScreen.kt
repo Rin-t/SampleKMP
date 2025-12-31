@@ -1,22 +1,41 @@
 package com.example.samplekmp.android.view
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.samplekmp.PokemonListUiState
+import com.example.samplekmp.PokemonUseCase
 import com.example.samplekmp.android.view.components.ErrorMessage
 import com.example.samplekmp.android.view.components.LoadingIndicator
 import com.example.samplekmp.android.view.components.PokemonGrid
-import com.example.samplekmp.android.viewModel.PokemonListUiState
-import com.example.samplekmp.android.viewModel.PokemonListViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun PokemonListScreen(
-    modifier: Modifier = Modifier,
-    viewModel: PokemonListViewModel = viewModel()
-) {
-    val uiState by viewModel.uiState.collectAsState()
+fun PokemonListScreen(modifier: Modifier = Modifier) {
+    var uiState by remember { mutableStateOf<PokemonListUiState>(PokemonListUiState.Loading) }
+    val useCase = remember { PokemonUseCase() }
+    val scope = rememberCoroutineScope()
+
+    val loadPokemonList: () -> Unit = {
+        scope.launch {
+            uiState = PokemonListUiState.Loading
+            try {
+                val list = useCase.fetchPokemonList(50, 0)
+                uiState = PokemonListUiState.Success(list)
+            } catch (e: Exception) {
+                uiState = PokemonListUiState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        loadPokemonList()
+    }
 
     when (val state = uiState) {
         is PokemonListUiState.Loading -> {
@@ -31,7 +50,7 @@ fun PokemonListScreen(
         is PokemonListUiState.Error -> {
             ErrorMessage(
                 message = state.message,
-                onRetry = { viewModel.loadPokemonList() },
+                onRetry = loadPokemonList,
                 modifier = modifier
             )
         }

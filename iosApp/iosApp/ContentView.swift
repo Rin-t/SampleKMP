@@ -2,11 +2,9 @@ import SwiftUI
 import shared
 
 struct ContentView: View {
-    @StateObject var viewModel = PokemonListViewModel()
-
     var body: some View {
         TabView {
-            PokemonListView(viewModel: viewModel)
+            PokemonListView()
                 .tabItem {
                     Image(systemName: "list.bullet")
                     Text("図鑑")
@@ -21,8 +19,15 @@ struct ContentView: View {
     }
 }
 
+enum PokemonListViewUiState {
+    case loading
+    case success([PokemonListItem])
+    case error(String)
+}
+
 struct PokemonListView: View {
-    @ObservedObject var viewModel: PokemonListViewModel
+    @State private var uiState: PokemonListViewUiState = .loading
+    private let useCase = PokemonUseCase()
 
     private let columns = [
         GridItem(.flexible()),
@@ -33,7 +38,7 @@ struct PokemonListView: View {
     var body: some View {
         NavigationView {
             Group {
-                switch viewModel.uiState {
+                switch uiState {
                 case .loading:
                     ProgressView()
                 case .success(let pokemonList):
@@ -49,12 +54,27 @@ struct PokemonListView: View {
                     VStack {
                         Text(message)
                         Button("再試行") {
-                            viewModel.loadPokemonList()
+                            Task {
+                                await loadPokemonList()
+                            }
                         }
                     }
                 }
             }
             .navigationTitle("ポケモン図鑑")
+            .task {
+                await loadPokemonList()
+            }
+        }
+    }
+
+    private func loadPokemonList() async {
+        uiState = .loading
+        do {
+            let pokemonList = try await useCase.fetchPokemonList(limit: 50, offset: 0)
+            uiState = .success(pokemonList)
+        } catch {
+            uiState = .error(error.localizedDescription)
         }
     }
 }
@@ -97,34 +117,5 @@ struct MenuView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
-    }
-}
-
-enum PokemonListUiState {
-    case loading
-    case success([PokemonListItem])
-    case error(String)
-}
-
-@MainActor
-final class PokemonListViewModel: ObservableObject {
-    @Published var uiState: PokemonListUiState = .loading
-
-    private let useCase = PokemonUseCase()
-
-    init() {
-        loadPokemonList()
-    }
-
-    func loadPokemonList() {
-        uiState = .loading
-        Task {
-            do {
-                let pokemonList = try await useCase.fetchPokemonList(limit: 50, offset: 0)
-                uiState = .success(pokemonList)
-            } catch {
-                uiState = .error(error.localizedDescription)
-            }
-        }
     }
 }

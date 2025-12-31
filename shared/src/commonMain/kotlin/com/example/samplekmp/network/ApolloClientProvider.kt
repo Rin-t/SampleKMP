@@ -1,4 +1,4 @@
-package com.example.samplekmp
+package com.example.samplekmp.network
 
 import com.apollographql.apollo.ApolloClient
 
