@@ -5,25 +5,24 @@ struct PokemonDetailPage: View {
     let navigator: IOSNavigator
     let pokemonId: Int32
 
-    @State private var uiState: PokemonDetailUiState = PokemonDetailUiState.Loading()
-
-    private var useCase: PokemonDetailUseCase {
-        KoinHelper.shared.getPokemonDetailUseCase(navigator: navigator, pokemonId: pokemonId)
-    }
+    @State private var state: PokemonDetailState = PokemonDetailState()
+    @State private var useCase: PokemonDetailUseCase?
 
     var body: some View {
         Group {
-            switch onEnum(of: uiState) {
-            case .loading:
+            switch onEnum(of: state.status) {
+            case .fetching:
                 ProgressView()
-            case .success(let success):
-                PokemonDetailContentView(pokemonDetail: success.pokemonDetail)
-            case .error(let error):
+            case .success:
+                if let detail = state.pokemonDetail {
+                    PokemonDetailContentView(pokemonDetail: detail)
+                }
+            case .failed(let failed):
                 VStack {
-                    Text(error.message)
+                    Text(failed.message)
                     Button("再試行") {
                         Task {
-                            await loadPokemonDetail()
+                            try await useCase?.fetchPokemonDetail()
                         }
                     }
                 }
@@ -34,7 +33,7 @@ struct PokemonDetailPage: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    useCase.navigateBack()
+                    useCase?.navigateBack()
                 } label: {
                     HStack {
                         Image(systemName: "chevron.left")
@@ -44,20 +43,14 @@ struct PokemonDetailPage: View {
             }
         }
         .task {
-            await loadPokemonDetail()
-        }
-    }
+            let uc = KoinHelper.shared.getPokemonDetailUseCase(navigator: navigator, pokemonId: pokemonId)
+            useCase = uc
 
-    private func loadPokemonDetail() async {
-        uiState = PokemonDetailUiState.Loading()
-        do {
-            if let detail = try await useCase.fetchPokemonDetail() {
-                uiState = PokemonDetailUiState.Success(pokemonDetail: detail)
-            } else {
-                uiState = PokemonDetailUiState.Error(message: "Pokemon not found")
+            async let _ = uc.fetchPokemonDetail()
+
+            for await newState in uc.state {
+                state = newState
             }
-        } catch {
-            uiState = PokemonDetailUiState.Error(message: error.localizedDescription)
         }
     }
 }

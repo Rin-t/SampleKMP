@@ -3,11 +3,8 @@ import shared
 
 struct PokemonListPage: View {
     @StateObject private var navigator = IOSNavigator()
-    @State private var uiState: PokemonListUiState = PokemonListUiState.Loading()
-
-    private var useCase: PokemonUseCase {
-        KoinHelper.shared.getPokemonUseCase(navigator: navigator)
-    }
+    @State private var state: PokemonListState = PokemonListState()
+    @State private var useCase: PokemonUseCase?
 
     private let columns = [
         GridItem(.flexible()),
@@ -18,15 +15,15 @@ struct PokemonListPage: View {
     var body: some View {
         NavigationStack(path: $navigator.path) {
             Group {
-                switch onEnum(of: uiState) {
-                case .loading:
+                switch onEnum(of: state.status) {
+                case .fetching:
                     ProgressView()
-                case .success(let success):
+                case .success:
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(success.pokemonList, id: \.id) { pokemon in
+                            ForEach(state.pokemonList, id: \.id) { pokemon in
                                 Button {
-                                    useCase.onTapGrid(pokemonId: pokemon.id)
+                                    useCase?.onTapGrid(pokemonId: pokemon.id)
                                 } label: {
                                     PokemonGridItemView(pokemon: pokemon)
                                 }
@@ -35,12 +32,12 @@ struct PokemonListPage: View {
                         }
                         .padding(8)
                     }
-                case .error(let error):
+                case .failed(let failed):
                     VStack {
-                        Text(error.message)
+                        Text(failed.message)
                         Button("再試行") {
                             Task {
-                                await loadPokemonList()
+                                try await useCase?.fetchPokemonList(limit: 50, offset: 0)
                             }
                         }
                     }
@@ -51,18 +48,15 @@ struct PokemonListPage: View {
                 PokemonDetailPage(navigator: navigator, pokemonId: destination.pokemonId)
             }
             .task {
-                await loadPokemonList()
-            }
-        }
-    }
+                let uc = KoinHelper.shared.getPokemonUseCase(navigator: navigator)
+                useCase = uc
 
-    private func loadPokemonList() async {
-        uiState = PokemonListUiState.Loading()
-        do {
-            let pokemonList = try await useCase.fetchPokemonList(limit: 50, offset: 0)
-            uiState = PokemonListUiState.Success(pokemonList: pokemonList)
-        } catch {
-            uiState = PokemonListUiState.Error(message: error.localizedDescription)
+                async let _ = uc.fetchPokemonList(limit: 50, offset: 0)
+
+                for await newState in uc.state {
+                    state = newState
+                }
+            }
         }
     }
 }
