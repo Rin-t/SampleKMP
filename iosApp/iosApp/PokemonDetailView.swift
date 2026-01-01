@@ -8,11 +8,13 @@ enum PokemonDetailViewUiState {
 }
 
 struct PokemonDetailView: View {
+    let navigator: IOSNavigator
     let pokemonId: Int32
 
     @State private var uiState: PokemonDetailViewUiState = .loading
+
     private var useCase: PokemonDetailUseCase {
-        KoinHelper.shared.getPokemonDetailUseCase(pokemonId: pokemonId)
+        KoinHelper.shared.getPokemonDetailUseCase(navigator: navigator, pokemonId: pokemonId)
     }
 
     var body: some View {
@@ -34,6 +36,19 @@ struct PokemonDetailView: View {
             }
         }
         .navigationTitle("詳細")
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    useCase.navigateBack()
+                } label: {
+                    HStack {
+                        Image(systemName: "chevron.left")
+                        Text("戻る")
+                    }
+                }
+            }
+        }
         .task {
             await loadPokemonDetail()
         }

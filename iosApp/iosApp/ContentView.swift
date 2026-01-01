@@ -26,8 +26,12 @@ enum PokemonListViewUiState {
 }
 
 struct PokemonListView: View {
+    @StateObject private var navigator = IOSNavigator()
     @State private var uiState: PokemonListViewUiState = .loading
-    private let useCase = KoinHelper.shared.getPokemonUseCase()
+
+    private var useCase: PokemonUseCase {
+        KoinHelper.shared.getPokemonUseCase(navigator: navigator)
+    }
 
     private let columns = [
         GridItem(.flexible()),
@@ -36,7 +40,7 @@ struct PokemonListView: View {
     ]
 
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $navigator.path) {
             Group {
                 switch uiState {
                 case .loading:
@@ -45,7 +49,9 @@ struct PokemonListView: View {
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 8) {
                             ForEach(pokemonList, id: \.id) { pokemon in
-                                NavigationLink(destination: PokemonDetailView(pokemonId: pokemon.id)) {
+                                Button {
+                                    useCase.onTapGrid(pokemonId: pokemon.id)
+                                } label: {
                                     PokemonGridItemView(pokemon: pokemon)
                                 }
                                 .buttonStyle(PlainButtonStyle())
@@ -65,6 +71,9 @@ struct PokemonListView: View {
                 }
             }
             .navigationTitle("ポケモン図鑑")
+            .navigationDestination(for: PokemonDetailDestination.self) { destination in
+                PokemonDetailView(navigator: navigator, pokemonId: destination.pokemonId)
+            }
             .task {
                 await loadPokemonList()
             }
@@ -110,7 +119,7 @@ struct PokemonGridItemView: View {
 
 struct MenuView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Text("メニュー")
                 .navigationTitle("メニュー")
         }
