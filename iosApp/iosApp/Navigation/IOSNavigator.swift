@@ -1,8 +1,9 @@
 import SwiftUI
 import shared
 
-class IOSNavigator: ObservableObject, Navigator {
-    @Published var path = NavigationPath()
+@Observable
+class IOSNavigator: Navigator {
+    var path = NavigationPath()
 
     func navigate(destination: Destination) {
         switch destination {

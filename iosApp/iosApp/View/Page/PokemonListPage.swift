@@ -2,7 +2,7 @@ import SwiftUI
 import shared
 
 struct PokemonListPage: View {
-    @StateObject private var navigator = IOSNavigator()
+    @State private var navigator = IOSNavigator()
     @State private var state: PokemonListState = PokemonListState()
     @State private var useCase: PokemonUseCase?
 
