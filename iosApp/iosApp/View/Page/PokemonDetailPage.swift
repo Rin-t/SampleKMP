@@ -1,17 +1,11 @@
 import SwiftUI
 import shared
 
-enum PokemonDetailPageUiState {
-    case loading
-    case success(PokemonDetail)
-    case error(String)
-}
-
 struct PokemonDetailPage: View {
     let navigator: IOSNavigator
     let pokemonId: Int32
 
-    @State private var uiState: PokemonDetailPageUiState = .loading
+    @State private var uiState: PokemonDetailUiState = PokemonDetailUiState.Loading()
 
     private var useCase: PokemonDetailUseCase {
         KoinHelper.shared.getPokemonDetailUseCase(navigator: navigator, pokemonId: pokemonId)
@@ -19,14 +13,14 @@ struct PokemonDetailPage: View {
 
     var body: some View {
         Group {
-            switch uiState {
+            switch onEnum(of: uiState) {
             case .loading:
                 ProgressView()
-            case .success(let pokemonDetail):
-                PokemonDetailContentView(pokemonDetail: pokemonDetail)
-            case .error(let message):
+            case .success(let success):
+                PokemonDetailContentView(pokemonDetail: success.pokemonDetail)
+            case .error(let error):
                 VStack {
-                    Text(message)
+                    Text(error.message)
                     Button("再試行") {
                         Task {
                             await loadPokemonDetail()
@@ -55,15 +49,15 @@ struct PokemonDetailPage: View {
     }
 
     private func loadPokemonDetail() async {
-        uiState = .loading
+        uiState = PokemonDetailUiState.Loading()
         do {
             if let detail = try await useCase.fetchPokemonDetail() {
-                uiState = .success(detail)
+                uiState = PokemonDetailUiState.Success(pokemonDetail: detail)
             } else {
-                uiState = .error("Pokemon not found")
+                uiState = PokemonDetailUiState.Error(message: "Pokemon not found")
             }
         } catch {
-            uiState = .error(error.localizedDescription)
+            uiState = PokemonDetailUiState.Error(message: error.localizedDescription)
         }
     }
 }

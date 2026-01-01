@@ -1,15 +1,9 @@
 import SwiftUI
 import shared
 
-enum PokemonListPageUiState {
-    case loading
-    case success([PokemonListItem])
-    case error(String)
-}
-
 struct PokemonListPage: View {
     @StateObject private var navigator = IOSNavigator()
-    @State private var uiState: PokemonListPageUiState = .loading
+    @State private var uiState: PokemonListUiState = PokemonListUiState.Loading()
 
     private var useCase: PokemonUseCase {
         KoinHelper.shared.getPokemonUseCase(navigator: navigator)
@@ -24,13 +18,13 @@ struct PokemonListPage: View {
     var body: some View {
         NavigationStack(path: $navigator.path) {
             Group {
-                switch uiState {
+                switch onEnum(of: uiState) {
                 case .loading:
                     ProgressView()
-                case .success(let pokemonList):
+                case .success(let success):
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(pokemonList, id: \.id) { pokemon in
+                            ForEach(success.pokemonList, id: \.id) { pokemon in
                                 Button {
                                     useCase.onTapGrid(pokemonId: pokemon.id)
                                 } label: {
@@ -41,9 +35,9 @@ struct PokemonListPage: View {
                         }
                         .padding(8)
                     }
-                case .error(let message):
+                case .error(let error):
                     VStack {
-                        Text(message)
+                        Text(error.message)
                         Button("再試行") {
                             Task {
                                 await loadPokemonList()
@@ -63,12 +57,12 @@ struct PokemonListPage: View {
     }
 
     private func loadPokemonList() async {
-        uiState = .loading
+        uiState = PokemonListUiState.Loading()
         do {
             let pokemonList = try await useCase.fetchPokemonList(limit: 50, offset: 0)
-            uiState = .success(pokemonList)
+            uiState = PokemonListUiState.Success(pokemonList: pokemonList)
         } catch {
-            uiState = .error(error.localizedDescription)
+            uiState = PokemonListUiState.Error(message: error.localizedDescription)
         }
     }
 }
