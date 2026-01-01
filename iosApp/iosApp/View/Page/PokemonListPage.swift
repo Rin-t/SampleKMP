@@ -38,7 +38,7 @@ struct PokemonListPage: View {
                         Text(failed.message)
                         Button("再試行") {
                             Task {
-                                try await useCase.onAppear(limit: 50, offset: 0)
+                                try await useCase.onTapRetryButton()
                             }
                         }
                     }
@@ -48,8 +48,9 @@ struct PokemonListPage: View {
             .navigationBarTitleDisplayMode(.inline)
             .withAppRouter()
             .task {
-                async let _ = useCase.onAppear(limit: 50, offset: 0)
-
+                try? await useCase.onAppear()
+            }
+            .task {
                 for await newState in useCase.state {
                     state = newState
                 }

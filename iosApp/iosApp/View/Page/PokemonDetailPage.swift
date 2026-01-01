@@ -19,7 +19,7 @@ struct PokemonDetailPage: View {
                     Text(failed.message)
                     Button("再試行") {
                         Task {
-                            try await useCase.fetchPokemonDetail()
+                            try await useCase.onAppear()
                         }
                     }
                 }
@@ -28,7 +28,7 @@ struct PokemonDetailPage: View {
         .navigationTitle("ポケモン詳細")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            usecase.onAppear()
+            try? await useCase.onAppear()
         }
         .task {
             for await newState in useCase.state {
