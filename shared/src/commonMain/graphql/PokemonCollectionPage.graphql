@@ -1,5 +1,5 @@
-query PokemonCollectionPage($limit: Int!, $offset: Int!) {
-  pokemon(limit: $limit, offset: $offset, order_by: { id: asc }) {
+query PokemonCollectionPage($offset: Int!) {
+  pokemon(limit: 50, offset: $offset, order_by: { id: asc }) {
     id
     name
     pokemonsprites {

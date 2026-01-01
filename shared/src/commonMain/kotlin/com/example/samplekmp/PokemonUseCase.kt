@@ -15,11 +15,25 @@ class PokemonUseCase(
     private val _state = MutableStateFlow(PokemonListState())
     val state: StateFlow<PokemonListState> = _state.asStateFlow()
 
-    suspend fun onAppear(limit: Int, offset: Int) {
+    private var offset: Int = 0
+
+    suspend fun onAppear() {
+        // 既にデータがある場合はスキップ
+        if (_state.value.status is RequestStatus.Success && _state.value.pokemonList.isNotEmpty()) {
+            return
+        }
+        fetch()
+    }
+
+    suspend fun onTapRetryButton() {
+        fetch()
+    }
+
+    private suspend fun fetch() {
         _state.value = _state.value.copy(status = RequestStatus.Fetching)
         try {
             val response = apolloClient.query(
-                PokemonCollectionPageQuery(limit = limit, offset = offset)
+                PokemonCollectionPageQuery(offset = offset)
             ).execute()
             val list = response.data?.pokemon?.map { it.toPokemonListItem() } ?: emptyList()
             _state.value = _state.value.copy(
