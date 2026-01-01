@@ -32,7 +32,7 @@ fun PokemonListPage(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        useCase.onAppear(50, 0)
+        useCase.onAppear()
     }
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -54,7 +54,7 @@ fun PokemonListPage(
             is RequestStatus.Failed -> {
                 ErrorMessage(
                     message = status.message,
-                    onRetry = { scope.launch { useCase.onAppear(50, 0) } },
+                    onRetry = { scope.launch { useCase.onTapRetryButton() } },
                     modifier = Modifier.fillMaxSize()
                 )
             }

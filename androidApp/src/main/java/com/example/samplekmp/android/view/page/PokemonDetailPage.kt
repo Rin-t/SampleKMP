@@ -87,7 +87,7 @@ fun PokemonDetailPage(
             is RequestStatus.Failed -> {
                 ErrorMessage(
                     message = status.message,
-                    onRetry = { scope.launch { useCase.fetchPokemonDetail() } },
+                    onRetry = { scope.launch { useCase.onAppear() } },
                     modifier = Modifier.fillMaxSize()
                 )
             }
