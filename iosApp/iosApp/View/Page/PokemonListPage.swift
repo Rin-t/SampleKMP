@@ -44,9 +44,7 @@ struct PokemonListPage: View {
                 }
             }
             .navigationTitle("ポケモン図鑑")
-            .navigationDestination(for: PokemonDetailDestination.self) { destination in
-                PokemonDetailPage(navigator: navigator, pokemonId: destination.pokemonId)
-            }
+            .withAppRouter(navigator: navigator)
             .task {
                 let uc = KoinHelper.shared.getPokemonUseCase(navigator: navigator)
                 useCase = uc

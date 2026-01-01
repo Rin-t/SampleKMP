@@ -2,11 +2,8 @@ import SwiftUI
 import shared
 
 struct PokemonDetailPage: View {
-    let navigator: IOSNavigator
-    let pokemonId: Int32
-
+    let useCase: PokemonDetailUseCase
     @State private var state: PokemonDetailState = PokemonDetailState()
-    @State private var useCase: PokemonDetailUseCase?
 
     var body: some View {
         Group {
@@ -22,7 +19,7 @@ struct PokemonDetailPage: View {
                     Text(failed.message)
                     Button("再試行") {
                         Task {
-                            try await useCase?.fetchPokemonDetail()
+                            try await useCase.fetchPokemonDetail()
                         }
                     }
                 }
@@ -33,7 +30,7 @@ struct PokemonDetailPage: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    useCase?.navigateBack()
+                    useCase.navigateBack()
                 } label: {
                     HStack {
                         Image(systemName: "chevron.left")
@@ -43,12 +40,9 @@ struct PokemonDetailPage: View {
             }
         }
         .task {
-            let uc = KoinHelper.shared.getPokemonDetailUseCase(navigator: navigator, pokemonId: pokemonId)
-            useCase = uc
+            async let _ = useCase.fetchPokemonDetail()
 
-            async let _ = uc.fetchPokemonDetail()
-
-            for await newState in uc.state {
+            for await newState in useCase.state {
                 state = newState
             }
         }
