@@ -2,9 +2,9 @@ import SwiftUI
 import shared
 
 struct PokemonListPage: View {
-    @State private var navigator = IOSNavigator()
+    @Environment(IOSNavigator.self) private var navigator
+    let useCase: PokemonUseCase
     @State private var state: PokemonListState = PokemonListState()
-    @State private var useCase: PokemonUseCase?
 
     private let columns = [
         GridItem(.flexible()),
@@ -13,6 +13,7 @@ struct PokemonListPage: View {
     ]
 
     var body: some View {
+        @Bindable var navigator = navigator
         NavigationStack(path: $navigator.path) {
             Group {
                 switch onEnum(of: state.status) {
@@ -23,7 +24,7 @@ struct PokemonListPage: View {
                         LazyVGrid(columns: columns, spacing: 8) {
                             ForEach(state.pokemonList, id: \.id) { pokemon in
                                 Button {
-                                    useCase?.onTapGrid(pokemonId: pokemon.id)
+                                    useCase.onTapGrid(pokemonId: pokemon.id)
                                 } label: {
                                     PokemonGridItemView(pokemon: pokemon)
                                 }
@@ -37,7 +38,7 @@ struct PokemonListPage: View {
                         Text(failed.message)
                         Button("再試行") {
                             Task {
-                                try await useCase?.onAppear(limit: 50, offset: 0)
+                                try await useCase.onAppear(limit: 50, offset: 0)
                             }
                         }
                     }
@@ -45,14 +46,11 @@ struct PokemonListPage: View {
             }
             .navigationTitle("ポケモン図鑑")
             .navigationBarTitleDisplayMode(.inline)
-            .withAppRouter(navigator: navigator)
+            .withAppRouter()
             .task {
-                let uc = KoinHelper.shared.getPokemonUseCase(navigator: navigator)
-                useCase = uc
+                async let _ = useCase.onAppear(limit: 50, offset: 0)
 
-                async let _ = uc.onAppear(limit: 50, offset: 0)
-
-                for await newState in uc.state {
+                for await newState in useCase.state {
                     state = newState
                 }
             }

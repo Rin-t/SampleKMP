@@ -1,13 +1,18 @@
 import SwiftUI
+import shared
 
 struct TabPage: View {
+    @State private var navigator = IOSNavigator()
+
     var body: some View {
         TabView {
-            PokemonListPage()
-                .tabItem {
-                    Image(systemName: "list.bullet")
-                    Text("図鑑")
-                }
+            PokemonListPage(
+                useCase: KoinHelper.shared.getPokemonUseCase(navigator: navigator)
+            )
+            .tabItem {
+                Image(systemName: "list.bullet")
+                Text("図鑑")
+            }
 
             MenuPage()
                 .tabItem {
@@ -15,6 +20,7 @@ struct TabPage: View {
                     Text("メニュー")
                 }
         }
+        .environment(navigator)
     }
 }
 

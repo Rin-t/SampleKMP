@@ -10,7 +10,7 @@ enum RouterDestination: Hashable {
 // MARK: - App Router
 
 struct AppRouter: ViewModifier {
-    let navigator: IOSNavigator
+    @Environment(IOSNavigator.self) private var navigator
 
     func body(content: Content) -> some View {
         content
@@ -28,8 +28,8 @@ struct AppRouter: ViewModifier {
 }
 
 extension View {
-    func withAppRouter(navigator: IOSNavigator) -> some View {
-        modifier(AppRouter(navigator: navigator))
+    func withAppRouter() -> some View {
+        modifier(AppRouter())
     }
 }
 
