@@ -24,18 +24,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.samplekmp.RequestStatus
 import com.example.samplekmp.PokemonDetail
-import com.example.samplekmp.PokemonDetailUiState
 import com.example.samplekmp.PokemonDetailUseCase
 import com.example.samplekmp.android.navigation.LocalNavigator
 import com.example.samplekmp.android.view.components.ErrorMessage
@@ -50,29 +48,13 @@ fun PokemonDetailPage(
     pokemonId: Int,
     modifier: Modifier = Modifier
 ) {
-    var uiState by remember { mutableStateOf<PokemonDetailUiState>(PokemonDetailUiState.Loading) }
     val navigator = LocalNavigator.current
     val useCase: PokemonDetailUseCase = koinInject { parametersOf(navigator, pokemonId) }
+    val state by useCase.state.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val loadPokemonDetail: () -> Unit = {
-        scope.launch {
-            uiState = PokemonDetailUiState.Loading
-            try {
-                val detail = useCase.fetchPokemonDetail()
-                if (detail != null) {
-                    uiState = PokemonDetailUiState.Success(detail)
-                } else {
-                    uiState = PokemonDetailUiState.Error("Pokemon not found")
-                }
-            } catch (e: Exception) {
-                uiState = PokemonDetailUiState.Error(e.message ?: "Unknown error")
-            }
-        }
-    }
-
     LaunchedEffect(pokemonId) {
-        loadPokemonDetail()
+        useCase.fetchPokemonDetail()
     }
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -88,22 +70,24 @@ fun PokemonDetailPage(
             }
         )
 
-        when (val state = uiState) {
-            is PokemonDetailUiState.Loading -> {
+        when (val status = state.status) {
+            is RequestStatus.Fetching -> {
                 LoadingIndicator(
                     modifier = Modifier.fillMaxSize()
                 )
             }
-            is PokemonDetailUiState.Success -> {
-                PokemonDetailContent(
-                    pokemonDetail = state.pokemonDetail,
-                    modifier = Modifier.fillMaxSize()
-                )
+            is RequestStatus.Success -> {
+                state.pokemonDetail?.let { detail ->
+                    PokemonDetailContent(
+                        pokemonDetail = detail,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
-            is PokemonDetailUiState.Error -> {
+            is RequestStatus.Failed -> {
                 ErrorMessage(
-                    message = state.message,
-                    onRetry = loadPokemonDetail,
+                    message = status.message,
+                    onRetry = { scope.launch { useCase.fetchPokemonDetail() } },
                     modifier = Modifier.fillMaxSize()
                 )
             }

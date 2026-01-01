@@ -7,14 +7,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.samplekmp.PokemonListUiState
 import com.example.samplekmp.PokemonUseCase
+import com.example.samplekmp.RequestStatus
 import com.example.samplekmp.android.navigation.LocalNavigator
 import com.example.samplekmp.android.view.components.ErrorMessage
 import com.example.samplekmp.android.view.components.LoadingIndicator
@@ -28,25 +26,13 @@ import org.koin.core.parameter.parametersOf
 fun PokemonListPage(
     modifier: Modifier = Modifier
 ) {
-    var uiState by remember { mutableStateOf<PokemonListUiState>(PokemonListUiState.Loading) }
     val navigator = LocalNavigator.current
     val useCase: PokemonUseCase = koinInject { parametersOf(navigator) }
+    val state by useCase.state.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val loadPokemonList: () -> Unit = {
-        scope.launch {
-            uiState = PokemonListUiState.Loading
-            try {
-                val list = useCase.fetchPokemonList(50, 0)
-                uiState = PokemonListUiState.Success(list)
-            } catch (e: Exception) {
-                uiState = PokemonListUiState.Error(e.message ?: "Unknown error")
-            }
-        }
-    }
-
     LaunchedEffect(Unit) {
-        loadPokemonList()
+        useCase.fetchPokemonList(50, 0)
     }
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -54,21 +40,21 @@ fun PokemonListPage(
             title = { Text("ポケモン図鑑") }
         )
 
-        when (val state = uiState) {
-            is PokemonListUiState.Loading -> {
+        when (val status = state.status) {
+            is RequestStatus.Fetching -> {
                 LoadingIndicator(modifier = Modifier.fillMaxSize())
             }
-            is PokemonListUiState.Success -> {
+            is RequestStatus.Success -> {
                 PokemonGrid(
                     pokemonList = state.pokemonList,
                     onItemClick = { pokemon -> useCase.onTapGrid(pokemon.id) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
-            is PokemonListUiState.Error -> {
+            is RequestStatus.Failed -> {
                 ErrorMessage(
-                    message = state.message,
-                    onRetry = loadPokemonList,
+                    message = status.message,
+                    onRetry = { scope.launch { useCase.fetchPokemonList(50, 0) } },
                     modifier = Modifier.fillMaxSize()
                 )
             }
