@@ -26,19 +26,6 @@ struct PokemonDetailPage: View {
             }
         }
         .navigationTitle("詳細")
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    useCase.navigateBack()
-                } label: {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("戻る")
-                    }
-                }
-            }
-        }
         .task {
             async let _ = useCase.fetchPokemonDetail()
 
