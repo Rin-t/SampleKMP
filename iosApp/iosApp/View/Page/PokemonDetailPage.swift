@@ -25,7 +25,8 @@ struct PokemonDetailPage: View {
                 }
             }
         }
-        .navigationTitle("詳細")
+        .navigationTitle("ポケモン詳細")
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             async let _ = useCase.fetchPokemonDetail()
 

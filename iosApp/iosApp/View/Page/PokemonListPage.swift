@@ -44,6 +44,7 @@ struct PokemonListPage: View {
                 }
             }
             .navigationTitle("ポケモン図鑑")
+            .navigationBarTitleDisplayMode(.inline)
             .withAppRouter(navigator: navigator)
             .task {
                 let uc = KoinHelper.shared.getPokemonUseCase(navigator: navigator)
