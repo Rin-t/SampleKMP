@@ -28,8 +28,9 @@ struct PokemonDetailPage: View {
         .navigationTitle("ポケモン詳細")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            async let _ = useCase.fetchPokemonDetail()
-
+            usecase.onAppear()
+        }
+        .task {
             for await newState in useCase.state {
                 state = newState
             }

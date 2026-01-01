@@ -37,7 +37,7 @@ struct PokemonListPage: View {
                         Text(failed.message)
                         Button("再試行") {
                             Task {
-                                try await useCase?.fetchPokemonList(limit: 50, offset: 0)
+                                try await useCase?.onAppear(limit: 50, offset: 0)
                             }
                         }
                     }
@@ -50,7 +50,7 @@ struct PokemonListPage: View {
                 let uc = KoinHelper.shared.getPokemonUseCase(navigator: navigator)
                 useCase = uc
 
-                async let _ = uc.fetchPokemonList(limit: 50, offset: 0)
+                async let _ = uc.onAppear(limit: 50, offset: 0)
 
                 for await newState in uc.state {
                     state = newState

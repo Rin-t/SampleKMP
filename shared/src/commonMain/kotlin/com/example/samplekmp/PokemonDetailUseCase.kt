@@ -15,7 +15,7 @@ class PokemonDetailUseCase(
     private val _state = MutableStateFlow(PokemonDetailState())
     val state: StateFlow<PokemonDetailState> = _state.asStateFlow()
 
-    suspend fun fetchPokemonDetail() {
+    suspend fun onAppear() {
         _state.value = _state.value.copy(status = RequestStatus.Fetching)
         try {
             val response = apolloClient.query(

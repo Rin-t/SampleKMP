@@ -54,7 +54,7 @@ fun PokemonDetailPage(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(pokemonId) {
-        useCase.fetchPokemonDetail()
+        useCase.onAppear()
     }
 
     Column(modifier = modifier.fillMaxSize()) {
