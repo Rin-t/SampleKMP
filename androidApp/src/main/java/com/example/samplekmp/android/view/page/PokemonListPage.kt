@@ -15,20 +15,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.samplekmp.PokemonListUiState
 import com.example.samplekmp.PokemonUseCase
+import com.example.samplekmp.android.navigation.LocalNavigator
 import com.example.samplekmp.android.view.components.ErrorMessage
 import com.example.samplekmp.android.view.components.LoadingIndicator
 import com.example.samplekmp.android.view.components.PokemonGrid
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PokemonListPage(
-    onNavigateToDetail: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var uiState by remember { mutableStateOf<PokemonListUiState>(PokemonListUiState.Loading) }
-    val useCase: PokemonUseCase = koinInject()
+    val navigator = LocalNavigator.current
+    val useCase: PokemonUseCase = koinInject { parametersOf(navigator) }
     val scope = rememberCoroutineScope()
 
     val loadPokemonList: () -> Unit = {
@@ -59,7 +61,7 @@ fun PokemonListPage(
             is PokemonListUiState.Success -> {
                 PokemonGrid(
                     pokemonList = state.pokemonList,
-                    onItemClick = { pokemon -> onNavigateToDetail(pokemon.id) },
+                    onItemClick = { pokemon -> useCase.onTapGrid(pokemon.id) },
                     modifier = Modifier.fillMaxSize()
                 )
             }

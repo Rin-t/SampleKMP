@@ -10,10 +10,11 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -21,6 +22,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.samplekmp.android.navigation.AndroidNavigator
+import com.example.samplekmp.android.navigation.LocalNavigator
 import com.example.samplekmp.android.view.page.MenuScreen
 import com.example.samplekmp.android.view.page.PokemonDetailPage
 import com.example.samplekmp.android.view.page.PokemonListPage
@@ -46,13 +49,15 @@ fun TabPage() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val navigator = AndroidNavigator(navController)
 
     val bottomNavItems = listOf(
         BottomNavItem(PokemonListRoute, "図鑑", Icons.Default.List),
         BottomNavItem(MenuRoute, "メニュー", Icons.Default.Menu)
     )
 
-    Scaffold(
+    CompositionLocalProvider(LocalNavigator provides navigator) {
+        Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             NavigationBar {
@@ -85,22 +90,16 @@ fun TabPage() {
                 .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
             composable<PokemonListRoute> {
-                PokemonListPage(
-                    onNavigateToDetail = { pokemonId ->
-                        navController.navigate(PokemonDetailRoute(pokemonId))
-                    }
-                )
+                PokemonListPage()
             }
             composable<MenuRoute> {
                 MenuScreen()
             }
             composable<PokemonDetailRoute> { backStackEntry ->
                 val route: PokemonDetailRoute = backStackEntry.toRoute()
-                PokemonDetailPage(
-                    pokemonId = route.pokemonId,
-                    onNavigateBack = { navController.popBackStack() }
-                )
+                PokemonDetailPage(pokemonId = route.pokemonId)
             }
+        }
         }
     }
 }

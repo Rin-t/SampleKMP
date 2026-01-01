@@ -37,6 +37,7 @@ import coil.compose.AsyncImage
 import com.example.samplekmp.PokemonDetail
 import com.example.samplekmp.PokemonDetailUiState
 import com.example.samplekmp.PokemonDetailUseCase
+import com.example.samplekmp.android.navigation.LocalNavigator
 import com.example.samplekmp.android.view.components.ErrorMessage
 import com.example.samplekmp.android.view.components.LoadingIndicator
 import kotlinx.coroutines.launch
@@ -47,11 +48,11 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun PokemonDetailPage(
     pokemonId: Int,
-    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var uiState by remember { mutableStateOf<PokemonDetailUiState>(PokemonDetailUiState.Loading) }
-    val useCase: PokemonDetailUseCase = koinInject { parametersOf(pokemonId) }
+    val navigator = LocalNavigator.current
+    val useCase: PokemonDetailUseCase = koinInject { parametersOf(navigator, pokemonId) }
     val scope = rememberCoroutineScope()
 
     val loadPokemonDetail: () -> Unit = {
@@ -78,7 +79,7 @@ fun PokemonDetailPage(
         TopAppBar(
             title = { Text("詳細") },
             navigationIcon = {
-                IconButton(onClick = onNavigateBack) {
+                IconButton(onClick = { useCase.navigateBack() }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "戻る"
