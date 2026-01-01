@@ -3,6 +3,7 @@ package com.example.samplekmp.di
 import com.apollographql.apollo.ApolloClient
 import com.example.samplekmp.PokemonDetailUseCase
 import com.example.samplekmp.PokemonUseCase
+import com.example.samplekmp.navigation.Navigator
 import org.koin.dsl.module
 
 val appModule = module {
@@ -11,6 +12,6 @@ val appModule = module {
             .serverUrl("https://graphql.pokeapi.co/v1beta2")
             .build()
     }
-    factory { PokemonUseCase(get()) }
-    factory { (id: Int) -> PokemonDetailUseCase(get(), id) }
+    factory { (navigator: Navigator) -> PokemonUseCase(get(), navigator) }
+    factory { (navigator: Navigator, id: Int) -> PokemonDetailUseCase(get(), navigator, id) }
 }
