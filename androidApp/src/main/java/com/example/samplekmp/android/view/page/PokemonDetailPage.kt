@@ -107,73 +107,106 @@ private fun PokemonDetailContent(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Header with image
-        AsyncImage(
-            model = pokemonDetail.spriteUrl,
-            contentDescription = pokemonDetail.name,
-            modifier = Modifier.size(200.dp),
-            contentScale = ContentScale.Fit
-        )
-
-        Text(
-            text = "#${pokemonDetail.id} ${pokemonDetail.name}",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
+        HeaderSection(pokemonDetail)
         Spacer(modifier = Modifier.height(8.dp))
-
-        // Types
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            pokemonDetail.types.forEach { type ->
-                Card {
-                    Text(
-                        text = type,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-        }
-
+        TypesSection(pokemonDetail)
         Spacer(modifier = Modifier.height(16.dp))
+        PhysicalSection(pokemonDetail)
+        Spacer(modifier = Modifier.height(24.dp))
+        StatsSection(pokemonDetail)
+        Spacer(modifier = Modifier.height(24.dp))
+        AbilitiesSection(pokemonDetail)
+    }
+}
 
-        // Height & Weight
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Height", style = MaterialTheme.typography.labelMedium)
-                Text(text = "${(pokemonDetail.height ?: 0) / 10.0} m")
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Weight", style = MaterialTheme.typography.labelMedium)
-                Text(text = "${(pokemonDetail.weight ?: 0) / 10.0} kg")
+@Composable
+private fun HeaderSection(pokemonDetail: PokemonDetail) {
+    AsyncImage(
+        model = pokemonDetail.spriteUrl,
+        contentDescription = pokemonDetail.name,
+        modifier = Modifier.size(200.dp),
+        contentScale = ContentScale.Fit
+    )
+    Text(
+        text = "#${pokemonDetail.id} ${pokemonDetail.name}",
+        style = MaterialTheme.typography.headlineMedium
+    )
+}
+
+@Composable
+private fun TypesSection(pokemonDetail: PokemonDetail) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        pokemonDetail.types.forEach { type ->
+            Card {
+                Text(
+                    text = type,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(24.dp))
+@Composable
+private fun PhysicalSection(pokemonDetail: PokemonDetail) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Height", style = MaterialTheme.typography.labelMedium)
+            Text(text = "${(pokemonDetail.height ?: 0) / 10.0} m")
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Weight", style = MaterialTheme.typography.labelMedium)
+            Text(text = "${(pokemonDetail.weight ?: 0) / 10.0} kg")
+        }
+    }
+}
 
-        // Stats
+@Composable
+private fun StatsSection(pokemonDetail: PokemonDetail) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Base Stats",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.Start)
+            style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         pokemonDetail.stats.forEach { stat ->
-            StatRow(statName = stat.name, statValue = stat.baseStat)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stat.name,
+                    modifier = Modifier.width(100.dp),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = stat.baseStat.toString(),
+                    modifier = Modifier.width(40.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                LinearProgressIndicator(
+                    progress = (stat.baseStat / 255f).coerceIn(0f, 1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(8.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(4.dp))
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Abilities
+@Composable
+private fun AbilitiesSection(pokemonDetail: PokemonDetail) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Abilities",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.Start)
+            style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -192,34 +225,5 @@ private fun PokemonDetailContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun StatRow(
-    statName: String,
-    statValue: Int,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = statName,
-            modifier = Modifier.width(100.dp),
-            style = MaterialTheme.typography.bodySmall
-        )
-        Text(
-            text = statValue.toString(),
-            modifier = Modifier.width(40.dp),
-            style = MaterialTheme.typography.bodyMedium
-        )
-        LinearProgressIndicator(
-            progress = (statValue / 255f).coerceIn(0f, 1f),
-            modifier = Modifier
-                .weight(1f)
-                .height(8.dp)
-        )
     }
 }
