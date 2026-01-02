@@ -53,7 +53,7 @@ struct PokemonDetailContentView: View {
                         .font(.headline)
 
                     ForEach(pokemonDetail.stats, id: \.name) { stat in
-                        StatRowView(statName: stat.name, statValue: Int(stat.baseStat))
+                        StatRow(statName: stat.name, statValue: Int(stat.baseStat))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

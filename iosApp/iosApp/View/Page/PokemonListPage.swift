@@ -26,7 +26,7 @@ struct PokemonListPage: View {
                                 Button {
                                     useCase.onTapGrid(pokemonId: pokemon.id)
                                 } label: {
-                                    PokemonGridItemView(pokemon: pokemon)
+                                    PokemonGridItem(pokemon: pokemon)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }

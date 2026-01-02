@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct StatRowView: View {
+struct StatRow: View {
     let statName: String
     let statValue: Int
 
