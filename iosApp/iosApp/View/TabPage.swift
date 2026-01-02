@@ -7,7 +7,7 @@ struct TabPage: View {
     var body: some View {
         TabView {
             PokemonListPage(
-                useCase: KoinHelper.shared.getPokemonUseCase(navigator: navigator)
+                useCase: KoinProvider.shared.getPokemonUseCase(navigator: navigator)
             )
             .tabItem {
                 Image(systemName: "list.bullet")

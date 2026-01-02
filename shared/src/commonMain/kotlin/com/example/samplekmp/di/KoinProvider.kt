@@ -8,13 +8,13 @@ import org.koin.core.component.get
 import org.koin.core.context.startKoin
 import org.koin.core.parameter.parametersOf
 
-fun initKoin() {
-    startKoin {
-        modules(appModule)
+object KoinProvider : KoinComponent {
+    fun init() {
+        startKoin {
+            modules(appModule)
+        }
     }
-}
 
-object KoinHelper : KoinComponent {
     fun getPokemonUseCase(navigator: Navigator): PokemonUseCase {
         return get { parametersOf(navigator) }
     }

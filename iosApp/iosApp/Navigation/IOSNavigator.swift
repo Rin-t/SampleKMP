@@ -17,7 +17,7 @@ struct AppRouter: ViewModifier {
             .navigationDestination(for: RouterDestination.self) { destination in
                 switch destination {
                 case .pokemonDetail(let pokemonId):
-                    let useCase = KoinHelper.shared.getPokemonDetailUseCase(
+                    let useCase = KoinProvider.shared.getPokemonDetailUseCase(
                         navigator: navigator,
                         pokemonId: pokemonId
                     )
