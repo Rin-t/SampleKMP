@@ -27,19 +27,10 @@ import com.example.samplekmp.android.navigation.LocalNavigator
 import com.example.samplekmp.android.view.page.MenuScreen
 import com.example.samplekmp.android.view.page.PokemonDetailPage
 import com.example.samplekmp.android.view.page.PokemonListPage
-import kotlinx.serialization.Serializable
+import com.example.samplekmp.navigation.Destination
 
-@Serializable
-object PokemonListRoute
-
-@Serializable
-object MenuRoute
-
-@Serializable
-data class PokemonDetailRoute(val pokemonId: Int)
-
-data class BottomNavItem<T : Any>(
-    val route: T,
+data class BottomNavItem(
+    val route: Destination,
     val label: String,
     val icon: ImageVector
 )
@@ -52,8 +43,8 @@ fun TabPage() {
     val navigator = AndroidNavigator(navController)
 
     val bottomNavItems = listOf(
-        BottomNavItem(PokemonListRoute, "図鑑", Icons.Default.List),
-        BottomNavItem(MenuRoute, "メニュー", Icons.Default.Menu)
+        BottomNavItem(Destination.PokemonList, "図鑑", Icons.Default.List),
+        BottomNavItem(Destination.Menu, "メニュー", Icons.Default.Menu)
     )
 
     CompositionLocalProvider(LocalNavigator provides navigator) {
@@ -84,19 +75,19 @@ fun TabPage() {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = PokemonListRoute,
+            startDestination = Destination.PokemonList,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = paddingValues.calculateBottomPadding())
         ) {
-            composable<PokemonListRoute> {
+            composable<Destination.PokemonList> {
                 PokemonListPage()
             }
-            composable<MenuRoute> {
+            composable<Destination.Menu> {
                 MenuScreen()
             }
-            composable<PokemonDetailRoute> { backStackEntry ->
-                val route: PokemonDetailRoute = backStackEntry.toRoute()
+            composable<Destination.PokemonDetail> { backStackEntry ->
+                val route: Destination.PokemonDetail = backStackEntry.toRoute()
                 PokemonDetailPage(pokemonId = route.pokemonId)
             }
         }
