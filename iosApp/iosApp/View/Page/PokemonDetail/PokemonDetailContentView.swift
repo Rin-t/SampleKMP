@@ -132,7 +132,7 @@ struct PokemonDetailContentView: View {
         let statColor = statColor(for: stat.baseStat)
 
         return HStack(spacing: 8) {
-            Text(formatStatName(stat.name))
+            Text(stat.displayName)
                 .font(.caption)
                 .fontWeight(.medium)
                 .foregroundColor(.secondary)
@@ -168,18 +168,6 @@ struct PokemonDetailContentView: View {
         case 80..<100: return Color(red: 1.0, green: 0.92, blue: 0.23)
         case 100..<120: return Color(red: 0.61, green: 0.80, blue: 0.40)
         default: return Color(red: 0.40, green: 0.73, blue: 0.42)
-        }
-    }
-
-    private func formatStatName(_ name: String) -> String {
-        switch name.lowercased() {
-        case "hp": return "HP"
-        case "attack": return "ATK"
-        case "defense": return "DEF"
-        case "special-attack": return "SpA"
-        case "special-defense": return "SpD"
-        case "speed": return "SPD"
-        default: return String(name.prefix(3)).uppercased()
         }
     }
 

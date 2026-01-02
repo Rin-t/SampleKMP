@@ -16,7 +16,18 @@ data class PokemonDetail(
 data class PokemonStat(
     val name: String,
     val baseStat: Int
-)
+) {
+    val displayName: String
+        get() = when (name.lowercase()) {
+            "hp" -> "HP"
+            "attack" -> "ATK"
+            "defense" -> "DEF"
+            "special-attack" -> "SpA"
+            "special-defense" -> "SpD"
+            "speed" -> "SPD"
+            else -> name.take(3).uppercase()
+        }
+}
 
 data class PokemonAbility(
     val name: String,

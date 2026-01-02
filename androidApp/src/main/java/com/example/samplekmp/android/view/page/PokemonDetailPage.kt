@@ -285,7 +285,7 @@ private fun StatsSection(pokemonDetail: PokemonDetail) {
 
             pokemonDetail.stats.forEach { stat ->
                 StatBar(
-                    name = stat.name,
+                    displayName = stat.displayName,
                     value = stat.baseStat,
                     maxValue = 255
                 )
@@ -297,7 +297,7 @@ private fun StatsSection(pokemonDetail: PokemonDetail) {
 
 @Composable
 private fun StatBar(
-    name: String,
+    displayName: String,
     value: Int,
     maxValue: Int
 ) {
@@ -314,7 +314,7 @@ private fun StatBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = formatStatName(name),
+            text = displayName,
             modifier = Modifier.width(45.dp),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium,
@@ -342,18 +342,6 @@ private fun StatBar(
                     .background(statColor)
             )
         }
-    }
-}
-
-private fun formatStatName(name: String): String {
-    return when (name.lowercase()) {
-        "hp" -> "HP"
-        "attack" -> "ATK"
-        "defense" -> "DEF"
-        "special-attack" -> "SpA"
-        "special-defense" -> "SpD"
-        "speed" -> "SPD"
-        else -> name.take(3).uppercase()
     }
 }
 
